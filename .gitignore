@@ -2,3 +2,4 @@ ml/dataset
 .vscode
 .idea
 venv
+ml/source/WordSubUNet-FullFrame-SingleLayer.caffemodel
