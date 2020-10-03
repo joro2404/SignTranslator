@@ -52,7 +52,7 @@
         android:id="@+id/infoButton"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginTop="152dp"
+        android:layout_marginTop="144dp"
         android:background="@drawable/ellipse_1"
         android:text="@string/some_id"
         android:textAppearance="@style/some_id"

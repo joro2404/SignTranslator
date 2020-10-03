@@ -16,4 +16,9 @@
     <string name="some_id">
         ?
 </string>
+
+    <string name="info_page">
+
+Info page
+</string>
 </resources>

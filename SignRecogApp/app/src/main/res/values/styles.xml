@@ -54,4 +54,16 @@
 
     </style>
 
+
+    <style name="info_page">
+
+        <item name="android:textSize">
+            24sp
+        </item>
+
+        <item name="android:textColor">
+            #FFFFFF
+        </item>
+
+    </style>
 </resources>

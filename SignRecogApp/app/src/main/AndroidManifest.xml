@@ -32,6 +32,9 @@
         <activity android:name=".MainActivity">
 
         </activity>
+        <activity android:name=".InfoActivity">
+
+        </activity>
     </application>
 
 </manifest>
