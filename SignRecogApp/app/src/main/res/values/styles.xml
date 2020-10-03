@@ -18,6 +18,9 @@
             #FFFFFF
         </item>
 
+        <item name="android:textStyle">
+            bold
+        </item>
     </style>
 
     <style name="start">
@@ -30,6 +33,10 @@
             #FFFFFF
         </item>
 
+        <item name="android:textStyle">
+            bold
+        </item>
+
     </style>
 
     <style name="some_id">
@@ -39,6 +46,10 @@
     </item>
     <item name="android:textColor">
         #FFFFFF
+    </item>
+
+    <item name="android:textStyle">
+        bold
     </item>
 
     </style>
