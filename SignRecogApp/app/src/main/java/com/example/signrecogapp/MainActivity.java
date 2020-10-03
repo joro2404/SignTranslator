@@ -11,6 +11,8 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.TextureView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -25,27 +27,6 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param activity
-     */
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,13 +35,32 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(new String[] {Manifest.permission.CAMERA}, 1);
             }
         }
-        // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        // Create our Preview view and set it as the content of our activity.
         mPreview = new Preview(this);
         setContentView(mPreview);
 
+        View topView = new View(this);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.height = 5;
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+
+        topView.setBackgroundColor(getResources().getColor(android.R.color.black));
+        addContentView(topView, layoutParams);
+
+        ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) topView.getLayoutParams();
+        marginLayoutParams.setMargins(0, 200, 0, 0);
+
+        View bottomView = new View(this);
+        layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.height = 5;
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+
+        bottomView.setBackgroundColor(getResources().getColor(android.R.color.black));
+        addContentView(bottomView, layoutParams);
+
+        marginLayoutParams = (ViewGroup.MarginLayoutParams) bottomView.getLayoutParams();
+        marginLayoutParams.setMargins(0, 800, 0, 0);
 
     }
 

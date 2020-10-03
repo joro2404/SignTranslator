@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
@@ -107,6 +108,14 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+
 
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, acquire the camera and tell it where
@@ -125,6 +134,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap = getResizedBitmap(bitmap, 254);
+                bitmap = RotateBitmap(bitmap, 90);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
                 byte[] imageBytes = baos.toByteArray();
                 final String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
@@ -158,6 +168,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                             HttpEntity entity = response.getEntity();
                             String result = EntityUtils.toString(entity);
                             Log.v(response.toString(), "http out " + thread_counter + ": " + result);
+                            //Toast.makeText(getContext(), "http out: " + response.toString(), Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -240,12 +251,9 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
         Camera.Parameters parameters = mCamera.getParameters();
-        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+        //List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
 
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-
-        // You need to choose the most appropriate previewSize for your app
-        //Camera.Size previewSize = previewSizes.get(15);
 
                 parameters.setPreviewSize(1920, 1080);
 
