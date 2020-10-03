@@ -62,6 +62,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
     SurfaceHolder mHolder;
     Camera mCamera;
     int filename = 0;
+    int thread_counter = 0;
 
     Preview(Context context) {
         super(context);
@@ -90,6 +91,22 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         return out;
     }
 
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, acquire the camera and tell it where
         // to draw.
@@ -103,19 +120,11 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                         getContext(), 1920, 1080, data);
                 bmData.copyTo(bitmap);
 
-                File imagefile = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_MOVIES)
-                        , "/" + "100" + ".jpg");
-                FileInputStream fis = null;
-                try{
-                    fis = new FileInputStream(imagefile);
-                }catch(FileNotFoundException e){
-                    e.printStackTrace();
-                }
-                Bitmap bm = BitmapFactory.decodeStream(fis);
+                bitmap = Bitmap.createBitmap(bitmap, 0,0,800, 800);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                bitmap = getResizedBitmap(bitmap, 254);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
                 byte[] imageBytes = baos.toByteArray();
                 final String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
@@ -129,7 +138,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 
                 postParameters = new ArrayList<NameValuePair>();
-                postParameters.add(new BasicNameValuePair("param1", encodedImage + "/n"));
+                postParameters.add(new BasicNameValuePair("param1", encodedImage));
 
                 try {
                     httpPost.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
@@ -142,8 +151,10 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                     @Override
                     public void run() {
                         try  {
+                            thread_counter++;
+                            Log.v("thread", "http" + thread_counter);
                             HttpResponse response = httpclient.execute(httpPost);
-                            Log.v(response.toString(), encodedImage);
+                            Log.v(response.toString(), "http out" + thread_counter);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -151,6 +162,11 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                 });
 
                 thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 Camera.Parameters parameters = camera.getParameters();
                 int imageFormat = parameters.getPreviewFormat();
