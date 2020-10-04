@@ -35,36 +35,50 @@ while len(frames) > 50:
 frames = np.array(frames)
 
 frames = np.array([f for f in frames])
-print(frames.shape)
 frames = np.moveaxis(frames, 0, 2)
 frames = torch.from_numpy(frames)
 print('frames:', frames.shape)
 
-model = i3d.InceptionI3d(2000, num_in_frames=50)
 
-with open('./lables.pkl', 'rb') as f:
-    labels = pickle.load(f)
-
-checkpoint = torch.load('./wlasl16.pth.tar', map_location='cpu')
-state_dict = {k[7:]: v for k, v in checkpoint['state_dict'].items()}
-model.load_state_dict(state_dict)
-model.eval()
-torch.no_grad()
 
 data = cv2.imread("./source/nine.jpg")
-data = cv2.resize(data, (224, 224))
-data = cv2.dnn.blobFromImage(data)  # this is (1, 3, 224, 224) shaped image
 
-data = np.repeat(data, 50, axis=1).reshape((-1, 1, 3, 224, 224))
-data = np.moveaxis(data, 0, 2)
-data = torch.from_numpy(data)
-
-print('data:', data.shape)
 
 # a = [x for x in labels['words'] if list(x)[0] == 't']
 
-a = model(data)
+
 # print(a)
-word_index = np.argmax(a['logits'].detach().numpy()[0])
-print(word_index)
-print(labels['words'][word_index])
+
+
+class Translator:
+    def __init__(self):
+        self.model = i3d.InceptionI3d(2000, num_in_frames=50)
+        self._load_weights()
+        with open('./lables.pkl', 'rb') as f:
+            self.labels = pickle.load(f)
+
+    def _load_weights(self):
+        checkpoint = torch.load('./wlasl16.pth.tar', map_location='cpu')
+        state_dict = {k[7:]: v for k, v in checkpoint['state_dict'].items()}
+        self.model.load_state_dict(state_dict)
+        self.model.eval()
+        torch.no_grad()
+
+    def predict_from_img(self, img):
+        data = self._prepare_image(img)
+        out = self.model(data)
+
+        word_index = np.argmax(out['logits'].detach().numpy()[0])
+        label = self.labels['words'][word_index]
+        print(word_index)
+        print(label)
+        return label
+
+    @staticmethod
+    def _prepare_image(img):
+        data = cv2.resize(img, (224, 224))
+        data = cv2.dnn.blobFromImage(data)  # this is (1, 3, 224, 224) shaped image
+
+        data = np.repeat(data, 50, axis=1).reshape((-1, 1, 3, 224, 224))
+        data = np.moveaxis(data, 0, 2)
+        return torch.from_numpy(data)
