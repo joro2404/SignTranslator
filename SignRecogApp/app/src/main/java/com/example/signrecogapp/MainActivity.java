@@ -12,7 +12,9 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +26,9 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private Preview mPreview;
-
+    Handler mHandler;
+    Thread thread;
+    boolean interrupted = false;
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         marginLayoutParams.setMargins(0, (int) (350*d), 0, 0);
 
 
-        TextView textView = new TextView(this);
+        final TextView textView = new TextView(this);
         layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.height = ViewGroup.LayoutParams.FILL_PARENT;
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -106,9 +110,32 @@ public class MainActivity extends AppCompatActivity {
         marginLayoutParams = (ViewGroup.MarginLayoutParams) button.getLayoutParams();
         marginLayoutParams.setMargins(0, (int) (600*d), 0, 0);
 
-
-
+        mHandler = new Handler();
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!interrupted){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView.setText(mPreview.getLastResposne());
+                        }
+                    });
+                    Log.v("thread", "in");
+                }
+            }
+        });
+        thread.start();
     }
-
+    @Override
+    public void onDestroy() {
+        interrupted = true;
+        super.onDestroy();
+    }
 
 }

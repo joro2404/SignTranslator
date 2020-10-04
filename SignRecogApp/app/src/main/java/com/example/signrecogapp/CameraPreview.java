@@ -139,7 +139,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                         getContext(), 1920, 1080, data);
                 bmData.copyTo(bitmap);
 
-                bitmap = Bitmap.createBitmap(bitmap, 0,0,800, 800);
+                bitmap = Bitmap.createBitmap(bitmap, 0,0,1000, 1000);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap = getResizedBitmap(bitmap, 254);
@@ -176,7 +176,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                             HttpResponse response = httpclient.execute(httpPost);
                             HttpEntity entity = response.getEntity();
                             String result = EntityUtils.toString(entity);
-                            setLastResposne(result);
+                            setLastResposne("http out" + result);
                             Log.v(response.toString(), "http out " + thread_counter + ": " + result);
                         } catch (Exception e) {
                             e.printStackTrace();
