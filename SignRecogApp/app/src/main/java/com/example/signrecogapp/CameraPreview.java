@@ -65,6 +65,15 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
     Camera mCamera;
     int filename = 0;
     int thread_counter = 0;
+    String lastResposne = "";
+
+    public String getLastResposne() {
+        return lastResposne;
+    }
+
+    public void setLastResposne(String lastResposne) {
+        this.lastResposne = lastResposne;
+    }
 
     Preview(Context context) {
         super(context);
@@ -167,8 +176,8 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                             HttpResponse response = httpclient.execute(httpPost);
                             HttpEntity entity = response.getEntity();
                             String result = EntityUtils.toString(entity);
+                            setLastResposne(result);
                             Log.v(response.toString(), "http out " + thread_counter + ": " + result);
-                            //Toast.makeText(getContext(), "http out: " + response.toString(), Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -182,45 +191,6 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                     e.printStackTrace();
                 }
 
-                Camera.Parameters parameters = camera.getParameters();
-                int imageFormat = parameters.getPreviewFormat();
-                if (imageFormat == ImageFormat.NV21)
-                {
-
-                    int w = parameters.getPreviewSize().width;
-                    int h = parameters.getPreviewSize().height;
-/*
-                    Rect rect = new Rect(0, 0, w, h);
-                    YuvImage img = new YuvImage(data, ImageFormat.NV21, w, h, null);
-                    OutputStream outStream = null;
-                    File file = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_MOVIES)
-                    , "/" + filename + ".jpg");
-
-                    if(filename > 20){
-                        filename = 0;
-                    }
-                    filename++;
-
-                    try
-                    {
-                        outStream = new FileOutputStream(file);
-                        img.compressToJpeg(rect, 100, outStream);
-                        outStream.flush();
-                        outStream.close();
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-*/
-
-                }
             }
 
         };
@@ -251,7 +221,6 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
         Camera.Parameters parameters = mCamera.getParameters();
-        //List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
 
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
