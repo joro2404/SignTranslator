@@ -19,9 +19,8 @@ def base_to_jpg(key):
 @app.route('/', methods=['POST'])
 def index():
     vod = [base_to_jpg('param' + str(i)) for i in range(16)]
-
-    return json.dumps({'name': 'alice',
-                       'email': 'alice@outlook.com'})
+    word = t.predict_from_img(vod[0])
+    return json.dumps({'word': word})
 
 
 app.run(host='0.0.0.0')
