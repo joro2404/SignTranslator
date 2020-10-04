@@ -1,8 +1,8 @@
 import torch
 import i3d
-import numpy as np
 import cv2
-
+import pickle
+import numpy as np
 
 frames = []
 vidcap = cv2.VideoCapture('./source/book.mp4')
@@ -39,7 +39,11 @@ frames = torch.from_numpy(frames)
 print('frames:', frames.shape)
 
 model = i3d.InceptionI3d(num_in_frames=50)
-checkpoint = torch.load('./source/wlasl16.pth.tar', map_location='cpu')
+
+with open('./lables.pkl', 'rb') as f:
+    labels = pickle.load(f)
+
+checkpoint = torch.load('./wlasl16.pth.tar', map_location='cpu')
 model.load_state_dict(checkpoint['state_dict'], strict=False)
 model.eval()
 
@@ -66,10 +70,19 @@ img = np.repeat(img, 50, axis=1).reshape((-1, 1, 3, 224, 224))
 pixel = img[0, 0, 2, 112, 112]
 img = np.moveaxis(img, 0, 2)
 img = torch.from_numpy(img)
-# print(img.shape)
 
 # print(np.array_equal(data, img))
 # print(pixel, data[0, 0, 112, 112])
-a = model.forward(frames)
-print(np.argmax(a['logits'].detach().numpy()[0]))
+# a = model.forward(frames)
+# print(np.argmax(a['logits'].detach().numpy()[0]))
+
+
+a = [x for x in labels['words'] if list(x)[0] == 't']
+print(labels['words_to_id']['three'])
+print(labels['words'][1800:1840])
+print(a)
+
+# a = model(data)
+# print(np.argmax(a['logits'].detach().numpy()[0]))
+
 
