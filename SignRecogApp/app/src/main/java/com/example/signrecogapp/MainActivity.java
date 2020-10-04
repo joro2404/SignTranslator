@@ -33,6 +33,12 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -83,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
 
         Button button = new Button(this);
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
 
         layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.height = (int) (45*d);
@@ -105,9 +118,6 @@ public class MainActivity extends AppCompatActivity {
         button.setText(R.string.back_button);
         marginLayoutParams = (ViewGroup.MarginLayoutParams) button.getLayoutParams();
         marginLayoutParams.setMargins(0, (int) (600*d), 0, 0);
-
-
-
     }
 
 
