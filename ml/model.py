@@ -3,6 +3,7 @@ import i3d
 import cv2
 import pickle
 import numpy as np
+from PIL import Image
 
 frames = []
 vidcap = cv2.VideoCapture('./source/book.mp4')
@@ -40,10 +41,6 @@ frames = torch.from_numpy(frames)
 print('frames:', frames.shape)
 
 
-
-data = cv2.imread("./source/nine.jpg")
-
-
 # a = [x for x in labels['words'] if list(x)[0] == 't']
 
 
@@ -76,9 +73,16 @@ class Translator:
 
     @staticmethod
     def _prepare_image(img):
+        with open('./source/foo.png', 'wb') as f:
+            f.write(img)
+        img = cv2.imread("./source/foo.png")
         data = cv2.resize(img, (224, 224))
         data = cv2.dnn.blobFromImage(data)  # this is (1, 3, 224, 224) shaped image
 
         data = np.repeat(data, 50, axis=1).reshape((-1, 1, 3, 224, 224))
         data = np.moveaxis(data, 0, 2)
         return torch.from_numpy(data)
+
+
+if __name__ == '__main__':
+    t = Translator()
