@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">SignRecogApp</string>
+    <string name="start">
+
+        Start
+
+    </string>
+
+    <string name="sign_transl">
+
+        Sign\nTranslator
+
+    </string>
+
+    <!--suppress AndroidDomInspection -->
+    <string name="some_id">
+        ?
+</string>
+
+    <string name="info_page">
+
+Info page
+</string>
+    <string name="back_button">◁ </string>
 </resources>
