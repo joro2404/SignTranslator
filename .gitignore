@@ -3,3 +3,5 @@ ml/dataset
 .idea
 venv
 ml/source/WordSubUNet-FullFrame-SingleLayer.caffemodel
+ml/models
+ml/utils
