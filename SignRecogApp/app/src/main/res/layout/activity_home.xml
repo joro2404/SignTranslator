@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/android_1">
@@ -38,8 +37,6 @@
         android:layout_height="200dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/ellipse_2"
-        android:elevation="4dp"
-        android:gravity="center"
         android:text="@string/start"
         android:textAppearance="@style/start"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -52,12 +49,12 @@
         android:id="@+id/infoButton"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginTop="144dp"
+        android:layout_marginBottom="90dp"
         android:background="@drawable/ellipse_1"
         android:text="@string/some_id"
         android:textAppearance="@style/some_id"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cameraButton" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
