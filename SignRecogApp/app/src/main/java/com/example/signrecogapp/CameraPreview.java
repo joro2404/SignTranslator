@@ -43,6 +43,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -66,6 +70,7 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
     int filename = 0;
     int thread_counter = 0;
     String lastResposne = "";
+    ArrayList<String> images = new ArrayList<>();
 
     public String getLastResposne() {
         return lastResposne;
@@ -148,47 +153,55 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
                 byte[] imageBytes = baos.toByteArray();
                 final String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-
+                images.add(encodedImage);
 
                 final HttpClient httpclient;
                 final HttpPost httpPost;
                 ArrayList<NameValuePair> postParameters;
                 httpclient = new DefaultHttpClient();
-                httpPost = new HttpPost("http://78.130.176.59/server/decode.php");
+                httpPost = new HttpPost("http://192.168.43.117:5000");
 
 
-                postParameters = new ArrayList<NameValuePair>();
-                postParameters.add(new BasicNameValuePair("param1", encodedImage));
-
-                try {
-                    httpPost.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                Thread thread = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try  {
-                            thread_counter++;
-                            Log.v("thread", "http" + thread_counter);
-                            HttpResponse response = httpclient.execute(httpPost);
-                            HttpEntity entity = response.getEntity();
-                            String result = EntityUtils.toString(entity);
-                            setLastResposne("http out" + result);
-                            Log.v(response.toString(), "http out " + thread_counter + ": " + result);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                if(images.size() >= 16) {
+                    postParameters = new ArrayList<NameValuePair>();
+                    for(int i = 0; i< images.size(); i++) {
+                        postParameters.add(new BasicNameValuePair("param" + i, images.get(i)));
                     }
-                });
+                    try {
+                        httpPost.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
-                thread.start();
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                thread_counter++;
+                                Log.v("thread", "http" + thread_counter);
+                                //HttpParams httpParameters = new BasicHttpParams();
+                                int timeoutConnection = 30000;
+                                httpclient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeoutConnection);
+                                httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, timeoutConnection);
+                                HttpResponse response = httpclient.execute(httpPost);
+                                HttpEntity entity = response.getEntity();
+                                String result = EntityUtils.toString(entity);
+                                setLastResposne("http out" + result);
+                                Log.v(response.toString(), "http out " + thread_counter + ": " + result);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                    thread.start();
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    images.clear();
                 }
 
             }
