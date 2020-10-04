@@ -6,3 +6,5 @@ ml/source/WordSubUNet-FullFrame-SingleLayer.caffemodel
 ml/models
 ml/utils
 ml/**/*.pth.tar
+ml/source/
+__pycache__/
