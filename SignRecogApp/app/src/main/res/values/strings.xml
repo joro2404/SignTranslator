@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">SignRecogApp</string>
+    <string name="start">
+
+        Start
+
+    </string>
+
+    <string name="sign_transl">
+
+        Sign\nTranslator
+
+    </string>
+
+    <!--suppress AndroidDomInspection -->
+    <string name="some_id">
+        ?
+</string>
+
+    <string name="info_page">
+
+Info page
+</string>
+    <string name="back_button">◁ </string>
+    <string name="header_1">How to use</string>
+    <string name="info">Just press the Start button and point your camera towards the signer and the translation will appear. It is that simple!</string>
+</resources>
