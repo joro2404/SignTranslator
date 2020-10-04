@@ -5,3 +5,4 @@ venv
 ml/source/WordSubUNet-FullFrame-SingleLayer.caffemodel
 ml/models
 ml/utils
+ml/**/*.pth.tar
