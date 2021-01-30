@@ -14,6 +14,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -53,6 +55,7 @@ public class myService extends Service {
     Thread threadTest;
     int stopThread = 0;
     int stopThreadSound = 0;
+
 
     @Override
     public void onCreate() {
@@ -116,6 +119,27 @@ public class myService extends Service {
         return (int)frequency;
     }
 
+    int stopSpam = 0;
+
+    public class MyPhoneStateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING:
+                    myAudioManager.setMode(3);
+                    break;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                    myAudioManager.setMode(3);
+                    break;
+                case TelephonyManager.CALL_STATE_IDLE:
+                    myAudioManager.setMode(0);
+                    stopSpam = 1;
+                    break;
+            }
+            super.onCallStateChanged(state, incomingNumber);
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -124,17 +148,23 @@ public class myService extends Service {
             @Override
             public void run() {
                 super.run();
-                while(stopThread == 0) {myAudioManager.setMode(3);
+                while(stopThread == 0) {
+                    if(stopSpam != 1) {
+                        myAudioManager.setMode(3);
+                    }
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
         };
-        thread1.start();
+        //thread1.start();
 
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        telephonyManager.listen(new MyPhoneStateListener(), PhoneStateListener.LISTEN_CALL_STATE);
 
         createNotificationChannel();
         builder = new NotificationCompat.Builder(this, "1")
@@ -151,47 +181,26 @@ public class myService extends Service {
         final int minSize = AudioRecord.getMinBufferSize(8000,AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
 
         final AudioRecord ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000,AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
-        myAudioManager.setMode(AudioManager.MODE_IN_CALL);
         ar.startRecording();
-        boolean recorder = true;
 
         Thread thread2 = new Thread(){
             @Override
             public void run() {
                 super.run();
                 while(stopThread == 0){
-                    myAudioManager.setMicrophoneMute(true);
+                    Log.d("mode", String.valueOf(myAudioManager.getMode()));
 
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    for(int i = 0; i < 20; i++) {
+                        Log.d("mode", String.valueOf(myAudioManager.getMode()));
+                        myAudioManager.setMicrophoneMute(true);
+                        myAudioManager.setMicrophoneMute(false);
+                        myAudioManager.setMicrophoneMute(true);
                     }
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
-
-                    myAudioManager.setMicrophoneMute(false);
-                    myAudioManager.setMicrophoneMute(true);
                 }
             }
         };
         thread2.start();
-
+/*
         thread = new Thread(){
             public void run(){
                     short[] buffer = new short[minSize];
@@ -202,7 +211,7 @@ public class myService extends Service {
                         int result = calculate(8000, buffer);
                         Log.d("result", String.valueOf(result));
 
-                        if(result > 200){
+                        if(result > 50){
                             myAudioManager.setMicrophoneMute(true);
 
 
@@ -225,13 +234,13 @@ public class myService extends Service {
                             i++;
                         }
 
-                         */
+
                     }
             }
         };
 
         thread.start();
-
+*/
         /*
         thread = new Thread()
         {
@@ -373,11 +382,10 @@ public class myService extends Service {
         myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         myAudioManager.setMicrophoneMute(false);
         //tonePlayer.stop();
+        myAudioManager.setMode(0);
 
         stopThread = 1;
-        stopThreadSound = 1;
         thread.interrupt();
-        threadSound.interrupt();
         notificationManager.cancel(1);
         super.onDestroy();
     }
