@@ -120,6 +120,21 @@ public class myService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.v("service", "on");
+        Thread thread1 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while(stopThread == 0) {myAudioManager.setMode(3);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread1.start();
+
 
         createNotificationChannel();
         builder = new NotificationCompat.Builder(this, "1")
@@ -133,14 +148,52 @@ public class myService extends Service {
         // notificationId is a unique int for each notification that you must define
         notificationManager.notify(1, builder.build());
 
-/*
+        final int minSize = AudioRecord.getMinBufferSize(8000,AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+
+        final AudioRecord ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000,AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
+        myAudioManager.setMode(AudioManager.MODE_IN_CALL);
+        ar.startRecording();
+        boolean recorder = true;
+
+        Thread thread2 = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while(stopThread == 0){
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
+                }
+            }
+        };
+        thread2.start();
+
         thread = new Thread(){
             public void run(){
-                    int minSize = AudioRecord.getMinBufferSize(8000,AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
-                    AudioRecord ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_UPLINK, 8000,AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
-                    myAudioManager.setMode(AudioManager.MODE_IN_CALL);
-                    ar.startRecording();
-                    boolean recorder = true;
                     short[] buffer = new short[minSize];
 
                     ar.startRecording();
@@ -149,7 +202,7 @@ public class myService extends Service {
                         int result = calculate(8000, buffer);
                         Log.d("result", String.valueOf(result));
 
-                        if(result > 400){
+                        if(result > 200){
                             myAudioManager.setMicrophoneMute(true);
 
 
@@ -172,15 +225,14 @@ public class myService extends Service {
                             i++;
                         }
 
-
+                         */
                     }
             }
         };
 
         thread.start();
-        */
 
-
+        /*
         thread = new Thread()
         {
             public void run() {
@@ -246,13 +298,16 @@ public class myService extends Service {
             }
         };
         threadTest.start();
-        threadSound = new Thread() {
+
+
+        threadSound = new Thread()
+        {
             public void run() {
                 tonePlayer = new ContinuousBuzzer();
                 tonePlayer.setToneFreqInHz(300);
                 tonePlayer.setVolume(60);
 
-                while (stopThreadSound == 0) {
+                while(stopThreadSound == 0) {
                     myAudioManager.setMode(AudioManager.MODE_IN_CALL);
                     myAudioManager.setSpeakerphoneOn(true);
                     tonePlayer.play();
@@ -260,7 +315,6 @@ public class myService extends Service {
             }
         };
         threadSound.start();
-
 
         threadSound2 = new Thread()
         {
@@ -309,7 +363,7 @@ public class myService extends Service {
             }
         };
         threadSound4.start();
-
+*/
         return START_STICKY;
     }
     @Override
