@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             askPermission();
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             startService(new Intent(MainActivity.this, FloatingViewService.class));
 
         } else if (Settings.canDrawOverlays(this)) {
@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             askPermission();
             Toast.makeText(this, "You need System Alert Window Permission to do this", Toast.LENGTH_SHORT).show();
         }
+
+         */
 //        checkPermission();
         Button startRec;
         startRec = (Button) findViewById(R.id.startRec);

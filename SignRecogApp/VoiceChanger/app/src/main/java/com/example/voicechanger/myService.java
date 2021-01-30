@@ -49,7 +49,7 @@ public class myService extends Service {
 
     Thread thread;
     Thread threadSound;
-    Thread threadSound2;
+    Thread thread2;
     Thread threadSound3;
     Thread threadSound4;
     Thread threadTest;
@@ -130,8 +130,12 @@ public class myService extends Service {
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     myAudioManager.setMode(3);
+                    myAudioManager.setSpeakerphoneOn(true);
+                    thread2.start();
+
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
+                    thread2.interrupt();
                     myAudioManager.setMode(0);
                     stopSpam = 1;
                     break;
@@ -176,30 +180,25 @@ public class myService extends Service {
 
         notificationManager = NotificationManagerCompat.from(this);
         // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(1, builder.build());
+//        notificationManager.notify(1, builder.build());
 
         final int minSize = AudioRecord.getMinBufferSize(8000,AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
 
         final AudioRecord ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000,AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
         ar.startRecording();
 
-        Thread thread2 = new Thread(){
+        thread2 = new Thread(){
             @Override
             public void run() {
                 super.run();
                 while(stopThread == 0){
                     Log.d("mode", String.valueOf(myAudioManager.getMode()));
-
-                    for(int i = 0; i < 20; i++) {
-                        Log.d("mode", String.valueOf(myAudioManager.getMode()));
                         myAudioManager.setMicrophoneMute(true);
                         myAudioManager.setMicrophoneMute(false);
                         myAudioManager.setMicrophoneMute(true);
-                    }
                 }
             }
         };
-        thread2.start();
 /*
         thread = new Thread(){
             public void run(){
@@ -308,23 +307,21 @@ public class myService extends Service {
         };
         threadTest.start();
 
-
+*/
         threadSound = new Thread()
         {
             public void run() {
                 tonePlayer = new ContinuousBuzzer();
                 tonePlayer.setToneFreqInHz(300);
-                tonePlayer.setVolume(60);
+                tonePlayer.setVolume(100);
 
                 while(stopThreadSound == 0) {
-                    myAudioManager.setMode(AudioManager.MODE_IN_CALL);
-                    myAudioManager.setSpeakerphoneOn(true);
                     tonePlayer.play();
                 }
             }
         };
         threadSound.start();
-
+/*
         threadSound2 = new Thread()
         {
             public void run() {
