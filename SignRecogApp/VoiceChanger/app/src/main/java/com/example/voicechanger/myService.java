@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -63,40 +64,6 @@ public class myService extends Service {
         super.onCreate();
     }
 
-    public double calculate(byte[] buffer) {
-
-        int bufferSizeInBytes = 1024;
-        double[] magnitude = new double[bufferSizeInBytes / 2];
-
-        //Create Complex array for use in FFT
-        Complex[] fftTempArray = new Complex[bufferSizeInBytes];
-        for (int i = 0; i < bufferSizeInBytes; i++) {
-            fftTempArray[i] = new Complex(buffer[i], 0);
-        }
-
-        //Obtain array of FFT data
-        final Complex[] fftArray = FFT.fft(fftTempArray);
-        // calculate power spectrum (magnitude) values from fft[]
-        for (int i = 0; i < (bufferSizeInBytes / 2) - 1; ++i) {
-
-            double real = fftArray[i].re();
-            double imaginary = fftArray[i].im();
-            magnitude[i] = Math.sqrt(real * real + imaginary * imaginary);
-
-        }
-
-        // find largest peak in power spectrum
-        double max_magnitude = magnitude[0];
-        int max_index = 0;
-        for (int i = 0; i < magnitude.length; ++i) {
-            if (magnitude[i] > max_magnitude) {
-                max_magnitude = (int) magnitude[i];
-                max_index = i;
-            }
-        }
-        double freq = 44100 * max_index / bufferSizeInBytes;//here will get frequency in hz like(17000,18000..etc)
-        return freq;
-    }
 
 
     public static int calculate(int sampleRate, short [] audioData){
@@ -130,7 +97,6 @@ public class myService extends Service {
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     myAudioManager.setMode(3);
-                    myAudioManager.setSpeakerphoneOn(true);
                     thread2.start();
 
                     break;
@@ -184,21 +150,36 @@ public class myService extends Service {
 
         final int minSize = AudioRecord.getMinBufferSize(8000,AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT);
 
-        final AudioRecord ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000,AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
-        ar.startRecording();
 
         thread2 = new Thread(){
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 super.run();
+                File outputFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp");;
+
+                MediaRecorder myAudioRecorder=new MediaRecorder();
+                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                myAudioRecorder.setOutputFile(outputFile);
+
+                try {
+                    myAudioRecorder.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                myAudioRecorder.start();
+
                 while(stopThread == 0){
                     Log.d("mode", String.valueOf(myAudioManager.getMode()));
-                        myAudioManager.setMicrophoneMute(true);
-                        myAudioManager.setMicrophoneMute(false);
-                        myAudioManager.setMicrophoneMute(true);
+                    myAudioManager.setMicrophoneMute(true);
+                    myAudioManager.setMicrophoneMute(false);
+                    myAudioManager.setMicrophoneMute(true);
                 }
+                myAudioRecorder.stop();
             }
-        };
+        };      //thread2.start();
 /*
         thread = new Thread(){
             public void run(){
@@ -308,19 +289,6 @@ public class myService extends Service {
         threadTest.start();
 
 */
-        threadSound = new Thread()
-        {
-            public void run() {
-                tonePlayer = new ContinuousBuzzer();
-                tonePlayer.setToneFreqInHz(300);
-                tonePlayer.setVolume(100);
-
-                while(stopThreadSound == 0) {
-                    tonePlayer.play();
-                }
-            }
-        };
-        threadSound.start();
 /*
         threadSound2 = new Thread()
         {
@@ -382,7 +350,7 @@ public class myService extends Service {
         myAudioManager.setMode(0);
 
         stopThread = 1;
-        thread.interrupt();
+        thread2.interrupt();
         notificationManager.cancel(1);
         super.onDestroy();
     }

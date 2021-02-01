@@ -3,23 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.voicechanger">
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
-        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" tools:ignore="ProtectedPermissions" />
 
     <application
         android:requestLegacyExternalStorage="true"
@@ -41,28 +32,6 @@
             <action android:name="android.intent.action.PHONE_STATE">
             </action></intent-filter>
         </service>
-        <service android:name=".AccService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:label="acc_service">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
-
-        </service>
-        <receiver android:name=".AnswerCallBroadcastReceiver">
-        <intent-filter>
-            <action android:name="android.intent.action.PHONE_STATE" />
-            <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-        </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".FloatingViewService"
-            android:enabled="true"
-            android:exported="false" />
 
 
     </application>
